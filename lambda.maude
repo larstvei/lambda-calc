@@ -1,6 +1,6 @@
 mod LAMBDA is
     including QID .
-    sorts Variable Term Configuration .
+    sorts Variable Term .
     subsort Variable < Term .
     subsort Qid < Variable .
 
