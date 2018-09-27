@@ -1,0 +1,43 @@
+mod LAMBDA is
+    including QID .
+    sorts Variable Term Configuration .
+    subsort Variable < Term .
+    subsort Qid < Variable .
+
+    op __ : Term Term -> Term [gather (E e) prec 120] .
+    op λ_._ : Variable Term -> Term [gather (e E) prec 121] .
+    op [_↦_]_ : Variable Term Term -> Term .
+
+    vars x y : Variable .
+    vars t₁ t₂ t₃ : Term .
+
+    rl (λ x . t₁) t₂ => [x ↦ t₂]t₁ .
+
+    eq  [x ↦ t₁]x          = t₁ .
+    ceq [x ↦ t₁]y          = y                  if x =/= y .
+    eq  [x ↦ t₁](λ x . t₂) = (λ x . t₂) .
+    ceq [x ↦ t₁](λ y . t₂) = (λ y . [x ↦ t₁]t₂) if x =/= y .
+    eq  [x ↦ t₃](t₁ t₂)    = [x ↦ t₃]t₁ [x ↦ t₃]t₂ .
+endm
+
+mod CHURCH-BOOLEAN is
+    including LAMBDA .
+
+    ops tru fls test and or not : -> Term .
+
+    vars t f : Variable .
+
+    eq tru = λ 't . λ 'f . 't .
+    eq fls = λ 't . λ 'f . 'f .
+
+    eq test = λ 'l . λ 'm . λ 'n . 'l 'm 'n .
+
+    eq and = λ 'b . λ 'c . 'b 'c fls .
+endm
+
+--- Examples
+rew test tru 'v 'w .
+rew test fls 'v 'w .
+
+rew and tru tru .
+rew and tru fls .
