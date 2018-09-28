@@ -1,23 +1,56 @@
 mod LAMBDA is
     including QID .
+
     sorts Variable Term .
     subsort Variable < Term .
     subsort Qid < Variable .
 
+    --- Calculus
     op __ : Term Term -> Term [gather (E e) prec 120] .
     op λ_._ : Variable Term -> Term [gather (e E) prec 121] .
-    op [_↦_]_ : Variable Term Term -> Term .
 
-    vars x y : Variable .
-    vars t₁ t₂ t₃ : Term .
+    var x : Variable .
+    vars t₁ t₂ : Term .
 
     rl (λ x . t₁) t₂ => [x ↦ t₂]t₁ .
 
-    eq  [x ↦ t₁]x          = t₁ .
-    ceq [x ↦ t₁]y          = y                  if x =/= y .
-    eq  [x ↦ t₁](λ x . t₂) = (λ x . t₂) .
-    ceq [x ↦ t₁](λ y . t₂) = (λ y . [x ↦ t₁]t₂) if x =/= y .
-    eq  [x ↦ t₃](t₁ t₂)    = [x ↦ t₃]t₁ [x ↦ t₃]t₂ .
+    --- Free variables
+    sort VariableSet .
+    subsort Variable < VariableSet .
+
+    op empty : -> VariableSet .
+    op _,_ : VariableSet VariableSet -> VariableSet [assoc comm id: empty prec 100] .
+    op _\_ : VariableSet VariableSet -> VariableSet [prec 101] .
+    op _∉_ : Variable VariableSet -> Bool [prec 101] .
+
+    var S₁ S₂ : VariableSet .
+
+    eq x, x, S₁ = x, S₁ .
+
+    eq S₁, x \ x, S₂  = S₁ \ S₂ .
+    eq S₁ \ S₂        = S₁ [owise] .
+
+    eq x ∉ x, S₁ = false .
+    eq x ∉ S₁    = true [owise] .
+
+    op FV_ : Term -> VariableSet .
+
+    eq FV(x)        = x .
+    eq FV(λ x . t₁) = FV(t₁) \ x .
+    eq FV(t₁ t₂)    = FV(t₁), FV(t₂) .
+
+    --- Substitution
+    op [_↦_]_ : Variable Term Term -> Term .
+
+    var y : Variable .
+    var s : Term .
+
+    eq  [x ↦ s]x          = s .
+    ceq [x ↦ s]y          = y                  if x =/= y .
+    eq  [x ↦ s](λ x . t₁) = (λ x . t₁) .
+    ceq [x ↦ s](λ y . t₁) = (λ y . [x ↦ s]t₁)  if x =/= y /\ y ∉ FV(s) .
+    eq  [x ↦ s](t₁ t₂)    = [x ↦ s]t₁ [x ↦ s]t₂ .
+
 endm
 
 mod CHURCH-BOOLEAN is
