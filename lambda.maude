@@ -1,4 +1,5 @@
 mod LAMBDA is
+    including BOOL .
     including QID .
 
     sorts Variable Term .
@@ -6,13 +7,18 @@ mod LAMBDA is
     subsort Qid < Variable .
 
     --- Calculus
-    op __ : Term Term -> Term [gather (E e) prec 120] .
     op λ_._ : Variable Term -> Term [gather (e E) prec 121] .
+    op __ : Term Term -> Term [gather (E e) prec 120] .
+    op if_then_else_ : Bool Term Term -> Term .
 
+    var b : Bool .
     var x : Variable .
     vars t₁ t₂ : Term .
 
     rl (λ x . t₁) t₂ => [x ↦ t₂]t₁ .
+
+    crl if b then t₁ else t₂ => t₁ if b .
+    crl if b then t₁ else t₂ => t₂ if not b .
 
     --- Free variables
     sort VariableSet .
