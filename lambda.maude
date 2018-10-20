@@ -110,6 +110,11 @@ mod SIMPLY-TYPED-LAMBDA-CALCULUS is
     crl Γ ⊢ (λ (x :: T₁) . t₂) : T₁ → T₂ => true
         if  Γ, x :: T₁ ⊢ t₂ : T₂ => true .
 
+    crl Γ ⊢ t₁ t₂ : T => true
+      if  λ (x :: T₂) . t₃ := t₁ /\
+          Γ ⊢ t₁ : T₂ → T => true /\
+          Γ ⊢ t₂ : T₂ => true .
+
     crl Γ ⊢ if t₁ then t₂ else t₃ : T => true
         if  Γ ⊢ t₁ : Bool => true /\
             Γ ⊢ t₂ : T    => true /\
