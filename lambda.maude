@@ -3,12 +3,12 @@ mod LAMBDA is
     including QID .
 
     sorts Variable Term .
-    subsort Variable < Term .
+    subsort Variable Bool < Term .
     subsort Qid < Variable .
 
     --- Calculus
-    op λ_._ : Variable Term -> Term [gather (e E) prec 121] .
-    op __ : Term Term -> Term [gather (E e) prec 120] .
+    op λ_._ : Variable Term -> Term [ctor gather (e E) prec 121] .
+    op __ : Term Term -> Term [ctor gather (E e) prec 120] .
     op if_then_else_ : Bool Term Term -> Term .
 
     var b : Bool .
@@ -24,9 +24,10 @@ mod LAMBDA is
     sort VariableSet .
     subsort Variable < VariableSet .
 
-    op empty : -> VariableSet .
-    op _,_ : VariableSet VariableSet -> VariableSet [assoc comm id: empty prec 100] .
+    op empty : -> VariableSet [ctor] .
+    op _,_ : VariableSet VariableSet -> VariableSet [ctor assoc comm id: empty prec 100] .
     op _\_ : VariableSet VariableSet -> VariableSet [prec 101] .
+    op _∈_ : Variable VariableSet -> Bool [prec 101] .
     op _∉_ : Variable VariableSet -> Bool [prec 101] .
 
     var S₁ S₂ : VariableSet .
@@ -36,8 +37,10 @@ mod LAMBDA is
     eq S₁, x \ x, S₂  = S₁ \ S₂ .
     eq S₁ \ S₂        = S₁ [owise] .
 
-    eq x ∉ x, S₁ = false .
-    eq x ∉ S₁    = true [owise] .
+    eq x ∈ x, S₁ = true .
+    eq x ∈ S₁    = false [owise] .
+
+    eq x ∉ S₁ = not x ∈ S₁ .
 
     op FV_ : Term -> VariableSet .
 
@@ -56,7 +59,6 @@ mod LAMBDA is
     eq  [x ↦ s](λ x . t₁) = (λ x . t₁) .
     ceq [x ↦ s](λ y . t₁) = (λ y . [x ↦ s]t₁)  if x =/= y /\ y ∉ FV(s) .
     eq  [x ↦ s](t₁ t₂)    = [x ↦ s]t₁ [x ↦ s]t₂ .
-
 endm
 
 mod CHURCH-BOOLEAN is
@@ -80,3 +82,36 @@ rew test fls 'v 'w .
 
 rew and tru tru .
 rew and tru fls .
+
+
+mod SIMPLY-TYPED-LAMBDA-CALCULUS is
+    including LAMBDA .
+
+    sorts Type TypedTerm TypedVariable Judgement TypeContext .
+    subsort TypedTerm < Term .
+    subsort TypedVariable < Variable .
+    subsort TypeContext < TypedVariable .
+    subsort Judgement < Bool .
+
+    op Bool : -> Type .
+    op _:_ : Term Type -> TypedTerm [ctor prec 123] .
+    op _::_ : Variable Type -> TypedVariable [ctor] .
+    op _⊢_ : TypeContext TypedTerm -> Judgement [ctor prec 124] .
+    op _→_ : Type Type -> Type [ctor] .
+
+    vars T T₁ T₂ : Type .
+    vars t₁ t₂ t₃ : Term .
+    var x : Variable .
+    var Γ : TypeContext .
+
+
+    rl Γ ⊢ x : T => x :: T ∈ Γ .
+
+    crl Γ ⊢ (λ (x :: T₁) . t₂) : T₁ → T₂ => true
+        if  Γ, x :: T₁ ⊢ t₂ : T₂ => true .
+
+    crl Γ ⊢ if t₁ then t₂ else t₃ : T => true
+        if  Γ ⊢ t₁ : Bool => true /\
+            Γ ⊢ t₂ : T    => true /\
+            Γ ⊢ t₃ : T    => true .
+endm
