@@ -90,13 +90,13 @@ mod SIMPLY-TYPED-LAMBDA-CALCULUS is
     sorts Type TypedTerm TypedVariable Judgement TypeContext .
     subsort TypedTerm < Term .
     subsort TypedVariable < Variable .
-    subsort TypeContext < TypedVariable .
+    subsort VariableSet < TypeContext .
     subsort Judgement < Bool .
 
     op Bool : -> Type .
-    op _:_ : Term Type -> TypedTerm [ctor prec 123] .
-    op _::_ : Variable Type -> TypedVariable [ctor] .
-    op _⊢_ : TypeContext TypedTerm -> Judgement [ctor prec 124] .
+    op _:_ : Term Type -> TypedTerm [ctor prec 124] .
+    op _::_ : Variable Type -> TypedVariable [ctor prec 50] .
+    op _⊢_ : TypeContext TypedTerm -> Judgement [ctor prec 125] .
     op _→_ : Type Type -> Type [ctor] .
 
     vars T T₁ T₂ : Type .
