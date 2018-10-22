@@ -2,9 +2,10 @@ mod LAMBDA is
     including BOOL .
     including QID .
 
-    sorts Variable Term .
+    sorts Variable UntypedVariable Term .
     subsort Variable Bool < Term .
-    subsort Qid < Variable .
+    subsort Qid < UntypedVariable .
+    subsort UntypedVariable < Variable .
 
     --- Calculus
     op λ_._ : Variable Term -> Term [ctor gather (e E) prec 121] .
@@ -12,7 +13,7 @@ mod LAMBDA is
     op if_then_else_ : Bool Term Term -> Term .
 
     var b : Bool .
-    var x : Variable .
+    var x : UntypedVariable .
     vars t₁ t₂ : Term .
 
     rl (λ x . t₁) t₂ => [x ↦ t₂]t₁ .
@@ -30,17 +31,18 @@ mod LAMBDA is
     op _∈_ : Variable VariableSet -> Bool [prec 101] .
     op _∉_ : Variable VariableSet -> Bool [prec 101] .
 
+    var v : Variable .
     var S₁ S₂ : VariableSet .
 
-    eq x, x, S₁ = x, S₁ .
+    eq v, v, S₁ = v, S₁ .
 
-    eq S₁, x \ x, S₂  = S₁ \ S₂ .
+    eq S₁, v \ v, S₂  = S₁ \ S₂ .
     eq S₁ \ S₂        = S₁ [owise] .
 
-    eq x ∈ x, S₁ = true .
-    eq x ∈ S₁    = false [owise] .
+    eq v ∈ v, S₁ = true .
+    eq v ∈ S₁    = false [owise] .
 
-    eq x ∉ S₁ = not x ∈ S₁ .
+    eq v ∉ S₁    = not (v ∈ S₁) .
 
     op FV_ : Term -> VariableSet .
 
@@ -88,22 +90,23 @@ mod SIMPLY-TYPED-LAMBDA-CALCULUS is
     including LAMBDA .
 
     sorts Type TypedTerm TypedVariable Judgement TypeContext .
-    subsort TypedTerm < Term .
     subsort TypedVariable < Variable .
     subsort VariableSet < TypeContext .
     subsort Judgement < Bool .
 
-    op Bool : -> Type .
+    op Boolean : -> Type [ctor] .
     op _:_ : Term Type -> TypedTerm [ctor prec 124] .
-    op _::_ : Variable Type -> TypedVariable [ctor prec 50] .
-    op _⊢_ : TypeContext TypedTerm -> Judgement [ctor prec 125] .
+    op _::_ : UntypedVariable Type -> TypedVariable [ctor prec 50] .
+    op ⊢_ : TypedTerm -> Judgement [ctor frozen prec 125] .
+    op _⊢_ : TypeContext TypedTerm -> Judgement [ctor frozen prec 125] .
     op _→_ : Type Type -> Type [ctor] .
 
     vars T T₁ T₂ : Type .
     vars t₁ t₂ t₃ : Term .
-    var x : Variable .
+    var x : UntypedVariable .
     var Γ : TypeContext .
 
+    eq ⊢ t₁ : T = empty ⊢ t₁ : T .
 
     rl Γ ⊢ x : T => x :: T ∈ Γ .
 
@@ -116,7 +119,7 @@ mod SIMPLY-TYPED-LAMBDA-CALCULUS is
           Γ ⊢ t₂ : T₂ => true .
 
     crl Γ ⊢ if t₁ then t₂ else t₃ : T => true
-        if  Γ ⊢ t₁ : Bool => true /\
-            Γ ⊢ t₂ : T    => true /\
-            Γ ⊢ t₃ : T    => true .
+        if  Γ ⊢ t₁ : Boolean => true /\
+            Γ ⊢ t₂ : T => true /\
+            Γ ⊢ t₃ : T => true .
 endm
