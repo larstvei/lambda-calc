@@ -108,6 +108,10 @@ mod SIMPLY-TYPED-LAMBDA-CALCULUS is
 
     eq ⊢ t₁ : T = empty ⊢ t₁ : T .
 
+    rl Γ ⊢ true : Boolean => true .
+
+    rl Γ ⊢ false : Boolean => true .
+
     rl Γ ⊢ x : T => x :: T ∈ Γ .
 
     crl Γ ⊢ (λ (x :: T₁) . t₂) : T₁ → T₂ => true
